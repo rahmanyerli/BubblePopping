@@ -11,7 +11,6 @@ export default class Player {
             y: 0
         }
         this.life = 0
-
     }
 
     draw() {
