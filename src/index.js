@@ -1,27 +1,30 @@
 import Game from "./game.js"
 
 let game
+let intervalId = null
+
+function mouseDown(event) {
+    game.createBullet(event)
+    intervalId = setInterval(() => {
+        game.createBullet(event)
+    }, 100)
+}
+
+function mouseUp() {
+    clearInterval(intervalId)
+    intervalId = null
+}
 
 window.addEventListener("DOMContentLoaded", () => {
     game = new Game()
 }, false)
 
-window.addEventListener("click", (event) => {
-    /*if (game.weaponLevel === 1) {
-        game.createBullet(event)
-        setTimeout(() => {
-            game.createBullet(event)
-        }, 150);
-        setTimeout(() => {
-            game.createBullet(event)
-        }, 300);
-    } else if (game.weaponLevel === 4) {
-        game.createBullet(event)
-        setTimeout(() => {
-            game.createBullet(event)
-        }, 150);
-    } else {}*/
-    game.createBullet(event)
+window.addEventListener("mousedown", (event) => {
+    mouseDown(event)
+}, false)
+
+window.addEventListener("mouseup", (event) => {
+    mouseUp()
 }, false)
 
 window.addEventListener("keydown", (event) => {
