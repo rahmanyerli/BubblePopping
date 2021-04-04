@@ -2,11 +2,13 @@ import Game from "./game.js"
 
 let game
 let intervalId = null
+let x
+let y
 
 function mouseDown(event) {
-    game.createBullet(event)
+    game.createBullet(x, y)
     intervalId = setInterval(() => {
-        game.createBullet(event)
+        game.createBullet(x, y)
     }, 100)
 }
 
@@ -17,6 +19,12 @@ function mouseUp() {
 
 window.addEventListener("DOMContentLoaded", () => {
     game = new Game()
+}, false)
+
+document.addEventListener('mousemove', event => {
+    x = event.clientX // / innerWidth
+    y = event.clientY // / innerHeight
+    console.log(x, y)
 }, false)
 
 window.addEventListener("mousedown", (event) => {

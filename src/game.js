@@ -114,7 +114,7 @@ export default class Game {
         return new Player(this.context, x, y, radius, color)
     }
 
-    createBullet(event) {
+    createBullet(targetX, targetY) {
         if (this.gameState !== GameStates.STARTED) {
             return
         }
@@ -125,7 +125,7 @@ export default class Game {
         const radius = this.bulletRadius
         const power = this.firePower
         const color = "#FFFFFF"
-        const angle = Math.atan2(event.clientY - y, event.clientX - x)
+        const angle = Math.atan2(targetY - y, targetX - x)
         let deviation = 0
         let velocity = {
             x: Math.cos(angle + deviation) * 12,
@@ -318,7 +318,7 @@ export default class Game {
 
     handleBonusAmmo() {
         if (this.firePower > 8) {
-            this.bonusAmmo -= this.firePower * (this.bulletRadius / 2 + 2)
+            this.bonusAmmo -= this.firePower * (this.bulletRadius / 2)
             this.ammo.innerText = this.bonusAmmo
         }
     }
