@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble Popping</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+    <table id="score_board">
+        <tr>
+            <td>Highest Score</td>
+            <td>&nbsp;:&nbsp;</td>
+            <td><span id="highest_score">0</span></td>
+        </tr>
+        <tr>
+            <td>Score</td>
+            <td>&nbsp;:&nbsp;</td>
+            <td><span id="score">0</span></td>
+        </tr>
+        <tr>
+            <td>Life</td>
+            <td>&nbsp;:&nbsp;</td>
+            <td><span id="life">0</span></td>
+        </tr>
+        <tr>
+            <td>Bonus Ammo</td>
+            <td>&nbsp;:&nbsp;</td>
+            <td><span id="ammo">0</span></td>
+        </tr>
+    </table>
+    <div id="menu_wrapper" class="menu-wrapper visible">
+        <div class="menu">
+            <h1>Bubble Popping</h1>
+            <h2 id="status">New Game</h2>
+            <h3>press <span class="color-white">ENTER</span> to start</h3>
+        </div>
+    </div>
+    <canvas></canvas>
+
+    <script type="module" src="./src/index.js"></script>
+</body>
+
+</html>
