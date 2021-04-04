@@ -2,7 +2,7 @@ export default class Sound {
 
     constructor(file, duration) {
         this.audio = document.createElement("audio")
-        this.audio.src = `../assets/sounds/${file}`
+        this.audio.src = `https://rahmanyerli.github.io/BubblePopping/assets/sounds/${file}`
         this.audio.setAttribute("preload", "auto")
         this.audio.setAttribute("controls", "none")
         this.audio.style.display = "none"
