@@ -395,7 +395,7 @@ export default class Game {
         setTimeout(() => {
             // refresh page
             location.reload()
-        }, 1500)
+        }, 2000)
     }
 
     saveScore() {
