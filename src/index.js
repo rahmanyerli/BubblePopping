@@ -22,9 +22,8 @@ window.addEventListener("DOMContentLoaded", () => {
 }, false)
 
 document.addEventListener('mousemove', event => {
-    x = event.clientX // / innerWidth
-    y = event.clientY // / innerHeight
-    console.log(x, y)
+    x = event.clientX
+    y = event.clientY
 }, false)
 
 window.addEventListener("mousedown", (event) => {
@@ -64,14 +63,8 @@ window.addEventListener("keydown", (event) => {
         case "ArrowDown":
             game.moveDown()
             break
-        case "1":
-            game.changeWeapon("Weapon1")
-            break
-        case "2":
-            game.changeWeapon("Weapon2")
-            break
-        case "3":
-            game.changeWeapon("Weapon3")
+        case " ":
+            game.createBullet(x, y)
             break
         default:
             break
@@ -82,13 +75,17 @@ window.addEventListener("keyup", (event) => {
     const key = event.key
     switch (key) {
         case "a":
+        case "A":
         case "d":
+        case "D":
         case "ArrowLeft":
         case "ArrowRight":
             game.stopLeftRight()
             break
         case "s":
+        case "S":
         case "w":
+        case "W":
         case "ArrowUp":
         case "ArrowDown":
             game.stopUpDown()

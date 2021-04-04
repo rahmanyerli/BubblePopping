@@ -266,7 +266,7 @@ export default class Game {
             // destroy the bullet and shrink the enemy
             this.bullets.splice(bulletIndex, 1)
             if (bullet.power <= enemy.strength) {
-                enemy.radius -= 0.1
+                enemy.radius -= 1
             } else {
                 enemy.radius -= bullet.power - enemy.strength
             }
