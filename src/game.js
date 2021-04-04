@@ -12,6 +12,16 @@ const GameStates = {
 }
 Object.freeze(GameStates)
 
+// game levels enum
+const GameLevels = {
+    LEVEL_1: { ENEMY_CREATION_SPEED: 2500, ENEMY_SPEED: 1 },
+    LEVEL_2: { ENEMY_CREATION_SPEED: 2000, ENEMY_SPEED: 1.25 },
+    LEVEL_3: { ENEMY_CREATION_SPEED: 1500, ENEMY_SPEED: 1.5 },
+    LEVEL_4: { ENEMY_CREATION_SPEED: 1000, ENEMY_SPEED: 1.75 },
+    LEVEL_5: { ENEMY_CREATION_SPEED: 500, ENEMY_SPEED: 2 },
+}
+Object.freeze(GameLevels)
+
 // weapon levels enum
 const WeaponLevels = {
     LEVEL_1: 1,
@@ -46,6 +56,7 @@ export default class Game {
         this.context = this.canvas.getContext("2d")
         this.animationId = 0
         this.gameState = GameStates.PAUSED
+        this.gameLevel = GameLevels.LEVEL_1
         this.currentScore = 0
         this.player = this.createPlayer()
         this.bullets = []
@@ -173,8 +184,8 @@ export default class Game {
 
         const angle = Math.atan2(this.player.y - y, this.player.x - x)
         const velocity = {
-            x: Math.cos(angle),
-            y: Math.sin(angle)
+            x: Math.cos(angle) * this.gameLevel.ENEMY_SPEED,
+            y: Math.sin(angle) * this.gameLevel.ENEMY_SPEED
         }
         const enemy = new Enemy(this.context, x, y, radius, color, velocity)
         this.enemies.push(enemy)
@@ -202,7 +213,7 @@ export default class Game {
     createEnemies() {
         this.interval = setInterval(() => {
             this.createEnemy()
-        }, 1500)
+        }, this.gameLevel.ENEMY_CREATION_SPEED)
     }
 
     handleEnemies() {
@@ -254,8 +265,10 @@ export default class Game {
         setTimeout(() => {
             // destroy the bullet and shrink the enemy
             this.bullets.splice(bulletIndex, 1)
-            if (bullet.power > enemy.strength) {
-                enemy.radius = enemy.radius - bullet.power + enemy.strength
+            if (bullet.power <= enemy.strength) {
+                enemy.radius -= 0.1
+            } else {
+                enemy.radius -= bullet.power - enemy.strength
             }
         }, 0)
         this.playShrinkSound()
@@ -274,6 +287,7 @@ export default class Game {
     handleHitScore(bullet) {
         this.currentScore += bullet.radius / 4
         this.score.innerText = this.currentScore
+        this.handleGameLevel()
     }
 
     handleDestroyScore(enemy) {
@@ -285,6 +299,21 @@ export default class Game {
         this.score.innerText = this.currentScore
         this.ammo.innerText = this.bonusAmmo
         this.handleWeapon()
+        this.handleGameLevel()
+    }
+
+    handleGameLevel() {
+        if (this.currentScore > 1000000) {
+            this.gameLevel = GameLevels.LEVEL_5
+        } else if (this.currentScore > 250000) {
+            this.gameLevel = GameLevels.LEVEL_4
+        } else if (this.currentScore > 50000) {
+            this.gameLevel = GameLevels.LEVEL_3
+        } else if (this.currentScore > 5000) {
+            this.gameLevel = GameLevels.LEVEL_2
+        } else {
+            this.gameLevel = GameLevels.LEVEL_1
+        }
     }
 
     handleBonusAmmo() {

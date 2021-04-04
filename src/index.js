@@ -37,18 +37,22 @@ window.addEventListener("keydown", (event) => {
             game.pause()
             break
         case "a":
+        case "A":
         case "ArrowLeft":
             game.moveLeft()
             break
         case "d":
+        case "D":
         case "ArrowRight":
             game.moveRight()
             break
         case "w":
+        case "W":
         case "ArrowUp":
             game.moveUp()
             break
         case "s":
+        case "S":
         case "ArrowDown":
             game.moveDown()
             break
