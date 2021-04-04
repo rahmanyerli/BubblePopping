@@ -40,6 +40,7 @@ export default class Game {
 
     constructor() {
         this.canvas = document.querySelector("canvas")
+        this.avoidCanvasSelection()
         this.canvas.width = innerWidth
         this.canvas.height = innerHeight
         this.context = this.canvas.getContext("2d")
@@ -65,6 +66,12 @@ export default class Game {
         this.life = document.getElementById("life")
         this.ammo = document.getElementById("ammo")
         this.getScore()
+    }
+
+    avoidCanvasSelection() {
+        this.canvas.addEventListener("selectstart", () => {
+            return false;
+        }, false)
     }
 
     animate() {
