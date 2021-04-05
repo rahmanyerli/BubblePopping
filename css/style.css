@@ -12,6 +12,7 @@
     cursor: default;
     user-select: none;
     -webkit-user-select: none;
+    -moz-user-select: none;
 }
 
 html,
@@ -39,17 +40,19 @@ h1 {
 }
 
 h2 {
-    margin-top: 2rem;
     font-size: 2rem;
     text-align: center;
     color: #FFCC44;
 }
 
 h3 {
-    margin-top: 2rem;
     font-size: 1.5rem;
     text-align: center;
     color: #999999;
+}
+
+p {
+    color: #666666;
 }
 
 .color-white {
@@ -75,12 +78,13 @@ h3 {
     position: absolute;
     display: block;
     width: 40rem;
-    height: 22rem;
+    height: 24rem;
     background-color: #333333;
     border-radius: 1rem;
-    padding: 4rem;
-    top: calc(50% - 11rem);
+    padding: 3rem;
+    top: calc(50% - 12rem);
     left: calc(50% - 20rem);
+    text-align: center;
 }
 
 .visible {
@@ -94,4 +98,31 @@ h3 {
 
 .active {
     color: #FF8844 !important;
+}
+
+.health {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: #FF5555;
+    margin-left: 0.25rem;
+    border-radius: 1rem;
+}
+
+.rocket {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: #88CC44;
+    margin-left: 0.25rem;
+    border-radius: 1rem;
+}
+
+.grenade {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: #00BBCC;
+    margin-left: 0.25rem;
+    border-radius: 1rem;
 }

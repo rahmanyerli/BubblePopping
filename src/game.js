@@ -14,11 +14,11 @@ Object.freeze(GameStates)
 
 // game levels enum
 const GameLevels = {
-    LEVEL_1: { ENEMY_CREATION_SPEED: 2500, ENEMY_SPEED: 1 },
-    LEVEL_2: { ENEMY_CREATION_SPEED: 2000, ENEMY_SPEED: 1.25 },
-    LEVEL_3: { ENEMY_CREATION_SPEED: 1500, ENEMY_SPEED: 1.5 },
-    LEVEL_4: { ENEMY_CREATION_SPEED: 1000, ENEMY_SPEED: 1.75 },
-    LEVEL_5: { ENEMY_CREATION_SPEED: 500, ENEMY_SPEED: 2 },
+    LEVEL_1: { ENEMY_CREATION_SPEED: 2000, ENEMY_SPEED: 1 },
+    LEVEL_2: { ENEMY_CREATION_SPEED: 1500, ENEMY_SPEED: 1.5 },
+    LEVEL_3: { ENEMY_CREATION_SPEED: 1250, ENEMY_SPEED: 2 },
+    LEVEL_4: { ENEMY_CREATION_SPEED: 1000, ENEMY_SPEED: 2.25 },
+    LEVEL_5: { ENEMY_CREATION_SPEED: 750, ENEMY_SPEED: 2.5 },
 }
 Object.freeze(GameLevels)
 
@@ -32,16 +32,26 @@ const WeaponLevels = {
 }
 Object.freeze(WeaponLevels)
 
+// fire types enum
+const FireTypes = {
+    BULLET: 1,
+    ROCKET: 2,
+    GRENADE: 3
+}
+Object.freeze(FireTypes)
+
 // sounds enum
 const Sounds = {
-    WEAPPON_LEVEL_1: { SOUND: "weapon1.wav", DURATION: 500 },
-    WEAPPON_LEVEL_2: { SOUND: "weapon2.wav", DURATION: 500 },
-    WEAPPON_LEVEL_3: { SOUND: "weapon3.wav", DURATION: 500 },
-    WEAPPON_LEVEL_4: { SOUND: "weapon3.wav", DURATION: 500 },
-    WEAPPON_LEVEL_5: { SOUND: "weapon3.wav", DURATION: 500 },
+    WEAPPON_LEVEL_1: { SOUND: "weapon1.wav", DURATION: 300 },
+    WEAPPON_LEVEL_2: { SOUND: "weapon2.wav", DURATION: 300 },
+    WEAPPON_LEVEL_3: { SOUND: "weapon3.wav", DURATION: 300 },
+    WEAPPON_LEVEL_4: { SOUND: "weapon3.wav", DURATION: 300 },
+    WEAPPON_LEVEL_5: { SOUND: "weapon3.wav", DURATION: 300 },
+    HEALTH: { SOUND: "health.wav", DURATION: 500 },
     WEAPPON_CHANGE: { SOUND: "weapon_change.wav", DURATION: 2000 },
-    SHRINK: { SOUND: "shrink.wav", DURATION: 500 },
-    DESTROY: { SOUND: "destroy2.wav", DURATION: 500 },
+    SHRINK: { SOUND: "shrink.wav", DURATION: 300 },
+    DESTROY: { SOUND: "destroy.wav", DURATION: 500 },
+    ACCESS_DENIED: { SOUND: "access_denied.wav", DURATION: 300 },
     GAME_OVER: { SOUND: "game_over.wav", DURATION: 2000 }
 }
 Object.freeze(Sounds)
@@ -63,19 +73,25 @@ export default class Game {
         this.enemies = []
         this.particles = []
         this.enemyRadiuses = [16, 32, 48, 64, 80, 96]
-        this.enemyColors = ["#FFCC33", "#FF7733", "#FF3333", "#CC3399", "#9933FF", "#6666FF"]
+        this.enemyColors = ["#FFCC44", "#FF8844", "#FF5544", "#CC3399", "#9933FF", "#6666FF"]
         this.weaponLevel = WeaponLevels.LEVEL_1
         this.weaponSound = Sounds.WEAPPON_LEVEL_1
-        this.bulletRadius = 4
-        this.firePower = 8
+        this.bulletRadius = 2
+        this.bulletPower = 1
         this.interval = 0
-        this.bonusAmmo = 0
         this.highestScore = document.getElementById("highest_score")
         this.score = document.getElementById("score")
         this.menu = document.getElementById("menu_wrapper")
         this.status = document.getElementById("status")
-        this.life = document.getElementById("life")
-        this.ammo = document.getElementById("ammo")
+        this.healthCount = 0
+        this.healthScore = 0
+        this.healths = document.getElementById("healths")
+        this.rocketCount = 0
+        this.rocketScore = 0
+        this.rockets = document.getElementById("rockets")
+        this.grenadeCount = 0
+        this.grenadeScore = 0
+        this.grenades = document.getElementById("grenades")
         this.getScore()
     }
 
@@ -118,12 +134,11 @@ export default class Game {
         if (this.gameState !== GameStates.STARTED) {
             return
         }
-        this.handleBonusAmmo()
         this.handleWeapon()
         const x = this.player.x
         const y = this.player.y
         const radius = this.bulletRadius
-        const power = this.firePower
+        const power = this.bulletPower
         const color = "#FFFFFF"
         const angle = Math.atan2(targetY - y, targetX - x)
         let deviation = 0
@@ -131,48 +146,122 @@ export default class Game {
             x: Math.cos(angle + deviation) * 12,
             y: Math.sin(angle + deviation) * 12
         }
-        switch (this.weaponLevel) {
-            case WeaponLevels.LEVEL_5:
-                // add first bullet
-                this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity))
-                    // add second bullet
-                deviation = 0.1
-                velocity = {
-                    x: Math.cos(angle + deviation) * 12,
-                    y: Math.sin(angle + deviation) * 12
-                }
-                this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity))
-                    // add third bullet
-                deviation = -0.1
-                velocity = {
-                    x: Math.cos(angle + deviation) * 12,
-                    y: Math.sin(angle + deviation) * 12
-                }
-                this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity))
-                this.playFireSound()
-                break
-            case WeaponLevels.LEVEL_4:
-                // add first bullet
-                this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity))
-                this.playFireSound()
-                setTimeout(() => {
-                    this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity))
-                    this.playFireSound()
-                }, 200);
-                break
-            default:
-                this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity))
-                this.playFireSound()
-                break
+        const fireType = FireTypes.BULLET
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        this.playFireSound()
+    }
+
+    createRocket(targetX, targetY) {
+        if (this.gameState !== GameStates.STARTED ||  this.rocketCount == 0) {
+            return
         }
+        this.handleWeapon()
+        const x = this.player.x
+        const y = this.player.y
+        const radius = this.bulletRadius * 3
+        const power = this.bulletPower * 24
+        const color = "#88CC44"
+        const angle = Math.atan2(targetY - y, targetX - x)
+        let velocity = {
+            x: Math.cos(angle) * 12,
+            y: Math.sin(angle) * 12
+        }
+        const fireType = FireTypes.ROCKET
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        this.playFireSound()
+        this.playWeaponChangedSound()
+        this.rocketCount -= 1
+        this.rocketScore = 0
+        this.rockets.removeChild(this.rockets.childNodes[0])
+    }
+
+    createGrenade(targetX, targetY) {
+        if (this.gameState !== GameStates.STARTED ||  this.grenadeCount == 0) {
+            return
+        }
+        this.handleWeapon()
+        const x = this.player.x
+        const y = this.player.y
+        const radius = this.bulletRadius * 2
+        const power = this.bulletPower * 12
+        const color = "#00BBCC"
+        let velocity = {}
+        const fireType = FireTypes.GRENADE
+        velocity = {
+            x: Math.cos(0) * 12,
+            y: Math.sin(0) * 12
+        }
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        velocity = {
+            x: Math.cos(30) * 12,
+            y: Math.sin(30) * 12
+        }
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        velocity = {
+            x: Math.cos(60) * 12,
+            y: Math.sin(60) * 12
+        }
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        velocity = {
+            x: Math.cos(90) * 12,
+            y: Math.sin(90) * 12
+        }
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        velocity = {
+            x: Math.cos(120) * 12,
+            y: Math.sin(120) * 12
+        }
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        velocity = {
+            x: Math.cos(150) * 12,
+            y: Math.sin(150) * 12
+        }
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        velocity = {
+            x: Math.cos(180) * 12,
+            y: Math.sin(180) * 12
+        }
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        velocity = {
+            x: Math.cos(210) * 12,
+            y: Math.sin(210) * 12
+        }
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        velocity = {
+            x: Math.cos(240) * 12,
+            y: Math.sin(240) * 12
+        }
+        this.bullets.push(new Bullet(this.context, x, y, radius, power, color, velocity, fireType))
+        this.playFireSound()
+        this.playWeaponChangedSound()
+        this.grenadeCount -= 1
+        this.grenadeScore = 0
+        this.grenades.removeChild(this.grenades.childNodes[0])
     }
 
     createEnemy() {
         let x
         let y
         const randomIndex = Math.floor(Math.random() * this.enemyRadiuses.length)
-        const radius = this.enemyRadiuses[randomIndex]
-        const color = this.enemyColors[randomIndex]
+        let radius = this.enemyRadiuses[randomIndex]
+        let color = this.enemyColors[randomIndex]
+        let armour = 0
+
+        if (this.gameLevel === GameLevels.LEVEL_5) {
+            const random = Math.floor(Math.random() * 32)
+            if (random === 13) {
+                radius = 96
+                color = "#999999"
+                armour = 5
+            }
+        } else if (this.gameLevel === GameLevels.LEVEL_4) {
+            const random = Math.floor(Math.random() * 16)
+            if (random === 13) {
+                radius = 64
+                color = "#666666"
+                armour = 4
+            }
+        }
 
         if (Math.random() < 0.5) {
             x = Math.random() < 0.5 ? 0 - radius : this.canvas.width + radius
@@ -187,7 +276,7 @@ export default class Game {
             x: Math.cos(angle) * this.gameLevel.ENEMY_SPEED,
             y: Math.sin(angle) * this.gameLevel.ENEMY_SPEED
         }
-        const enemy = new Enemy(this.context, x, y, radius, color, velocity)
+        const enemy = new Enemy(this.context, x, y, radius, color, velocity, armour)
         this.enemies.push(enemy)
     }
 
@@ -247,181 +336,220 @@ export default class Game {
             const isHit = bulletDistance - enemy.radius - bullet.radius < 0
             if (isHit) {
                 this.createParticles(enemy, bullet)
-                this.shrinkOrDestroy(enemy, bullet, bulletIndex, enemyIndex)
+                this.shrinkOrDestroy(bullet, bulletIndex, enemy, enemyIndex)
             }
         })
     }
 
-    shrinkOrDestroy(enemy, bullet, bulletIndex, enemyIndex) {
+    shrinkOrDestroy(bullet, bulletIndex, enemy, enemyIndex) {
         if (enemy.radius > 24) {
             this.shrinkEnemy(bullet, bulletIndex, enemy)
         } else {
-            this.destroyEnemy(enemy, bulletIndex, enemyIndex)
+            this.destroyEnemy(bullet, bulletIndex, enemy, enemyIndex)
         }
     }
 
     shrinkEnemy(bullet, bulletIndex, enemy) {
-        this.handleHitScore(bullet)
         setTimeout(() => {
-            // destroy the bullet and shrink the enemy
-            this.bullets.splice(bulletIndex, 1)
-            if (bullet.power <= enemy.strength) {
-                enemy.radius -= 1
-            } else {
-                enemy.radius -= bullet.power - enemy.strength
+            // destroy bullet or grenades
+            if (bullet.fireType === FireTypes.BULLET || bullet.fireType === FireTypes.GRENADE) {
+                this.bullets.splice(bulletIndex, 1)
             }
+            // shrink the enemy
+            enemy.radius -= bullet.power - enemy.armour
         }, 0)
         this.playShrinkSound()
     }
 
-    destroyEnemy(enemy, bulletIndex, enemyIndex) {
+    destroyEnemy(bullet, bulletIndex, enemy, enemyIndex) {
         this.handleDestroyScore(enemy)
         this.playDestroySound()
         setTimeout(() => {
-            // destroy the bullet and the enemy
-            this.bullets.splice(bulletIndex, 1)
+            // destroy bullet or grenade
+            if (bullet.fireType === FireTypes.BULLET || bullet.fireType === FireTypes.GRENADE) {
+                this.bullets.splice(bulletIndex, 1)
+            }
+            // destroy the enemy
             this.enemies.splice(enemyIndex, 1)
         }, 0)
-    }
-
-    handleHitScore(bullet) {
-        this.currentScore += bullet.radius / 4
-        this.score.innerText = this.currentScore
-        this.handleGameLevel()
     }
 
     handleDestroyScore(enemy) {
         const score = Math.floor(Math.pow(enemy.defaultRadius / 8, 3))
         this.currentScore += score
-        this.bonusAmmo += score
-        this.player.life += Math.floor(enemy.defaultRadius / 8)
-        this.life.innerText = this.player.life
+        this.healthScore += Math.floor(enemy.defaultRadius / 8)
+        this.rocketScore += score
+        this.grenadeScore += score
         this.score.innerText = this.currentScore
-        this.ammo.innerText = this.bonusAmmo
-        this.handleWeapon()
         this.handleGameLevel()
+        this.handleWeapon()
+        this.handleHealths()
+        this.handleRockets()
+        this.handleGrenades()
+    }
+
+    handleHealths() {
+        if (this.healthCount === 10) {
+            this.healthScore = 0
+        } else if (this.healthScore > 16) {
+            // add health
+            this.healthScore = 0
+            this.healthCount += 1
+            const health = document.createElement("span")
+            health.classList.add("health")
+            this.healths.appendChild(health)
+            this.playHealthSound()
+        }
+    }
+
+    handleRockets() {
+        if (this.rocketCount === 10) {
+            this.rocketScore = 0
+        } else if (this.rocketScore > 512) {
+            // add rocket
+            this.rocketScore = 0
+            this.rocketCount += 1
+            const rocket = document.createElement("span")
+            rocket.classList.add("rocket")
+            this.rockets.appendChild(rocket)
+            this.playWeaponChangedSound()
+        }
+    }
+
+    handleGrenades() {
+        if (this.grenadeCount === 10) {
+            this.grenadeScore = 0
+        } else if (this.grenadeScore > 1024) {
+            // add grenade
+            this.grenadeScore = 0
+            this.grenadeCount += 1
+            const grenade = document.createElement("span")
+            grenade.classList.add("grenade")
+            this.grenades.appendChild(grenade)
+            this.playWeaponChangedSound()
+        }
     }
 
     handleGameLevel() {
-        if (this.currentScore > 1000000) {
+        if (this.currentScore > 10000000) {
+            if (this.gameLevel === GameLevels.LEVEL_5) {
+                return
+            }
             this.gameLevel = GameLevels.LEVEL_5
-        } else if (this.currentScore > 250000) {
+            this.refresh()
+        } else if (this.currentScore > 1000000) {
+            if (this.gameLevel === GameLevels.LEVEL_4) {
+                return
+            }
             this.gameLevel = GameLevels.LEVEL_4
-        } else if (this.currentScore > 50000) {
+            this.refresh()
+        } else if (this.currentScore > 100000) {
+            if (this.gameLevel === GameLevels.LEVEL_3) {
+                return
+            }
             this.gameLevel = GameLevels.LEVEL_3
-        } else if (this.currentScore > 5000) {
+            this.refresh()
+        } else if (this.currentScore > 10000) {
+            if (this.gameLevel === GameLevels.LEVEL_2) {
+                return
+            }
             this.gameLevel = GameLevels.LEVEL_2
+            this.refresh()
         } else {
             this.gameLevel = GameLevels.LEVEL_1
         }
     }
 
-    handleBonusAmmo() {
-        if (this.firePower > 8) {
-            this.bonusAmmo -= this.firePower * (this.bulletRadius / 2)
-            this.ammo.innerText = this.bonusAmmo
-        }
-    }
-
     handleWeapon() {
-        if (this.bonusAmmo > 10000) {
-            if (this.weaponLevel !== WeaponLevels.LEVEL_5) {
-                this.player.radius = 40
+        switch (this.gameLevel) {
+            case GameLevels.LEVEL_5:
+                if (this.weaponLevel === WeaponLevels.LEVEL_5) {
+                    return
+                }
+                this.player.radius = 56
                 this.weaponLevel = WeaponLevels.LEVEL_5
                 this.weaponSound = Sounds.WEAPPON_LEVEL_5
-                this.firePower = 24
-                this.bulletRadius = 12
+                this.bulletPower = 5
+                this.bulletRadius = 10
                 this.playWeaponChangedSound()
-            }
-        } else if (this.bonusAmmo > 5000) {
-            if (this.weaponLevel !== WeaponLevels.LEVEL_4) {
-                this.player.radius = 40
+                break;
+            case GameLevels.LEVEL_4:
+                if (this.weaponLevel === WeaponLevels.LEVEL_4) {
+                    return
+                }
+                this.player.radius = 48
                 this.weaponLevel = WeaponLevels.LEVEL_4
                 this.weaponSound = Sounds.WEAPPON_LEVEL_4
-                this.firePower = 24
-                this.bulletRadius = 12
+                this.bulletPower = 4
+                this.bulletRadius = 8
                 this.playWeaponChangedSound()
-            }
-        } else if (this.bonusAmmo > 2000) {
-            if (this.weaponLevel !== WeaponLevels.LEVEL_3) {
+                break;
+            case GameLevels.LEVEL_3:
+                if (this.weaponLevel === WeaponLevels.LEVEL_3) {
+                    return
+                }
                 this.player.radius = 40
                 this.weaponLevel = WeaponLevels.LEVEL_3
                 this.weaponSound = Sounds.WEAPPON_LEVEL_3
-                this.firePower = 24
-                this.bulletRadius = 12
+                this.bulletPower = 3
+                this.bulletRadius = 6
                 this.playWeaponChangedSound()
-            }
-        } else if (this.bonusAmmo > 1000) {
-            if (this.weaponLevel !== WeaponLevels.LEVEL_2) {
+                break;
+            case GameLevels.LEVEL_2:
+                if (this.weaponLevel === WeaponLevels.LEVEL_2) {
+                    return
+                }
                 this.player.radius = 32
                 this.weaponLevel = WeaponLevels.LEVEL_2
                 this.weaponSound = Sounds.WEAPPON_LEVEL_2
-                this.firePower = 16
-                this.bulletRadius = 8
+                this.bulletPower = 2
+                this.bulletRadius = 4
                 this.playWeaponChangedSound()
-            }
-        } else {
-            if (this.weaponLevel !== WeaponLevels.LEVEL_1) {
+                break;
+            default:
+                if (this.weaponLevel === WeaponLevels.LEVEL_1) {
+                    return
+                }
                 this.player.radius = 24
                 this.weaponLevel = WeaponLevels.LEVEL_1
                 this.weaponSound = Sounds.WEAPPON_LEVEL_1
-                this.firePower = 8
-                this.bulletRadius = 4
+                this.bulletPower = 1
+                this.bulletRadius = 2
                 this.playWeaponChangedSound()
-            }
+                break;
         }
-    }
-
-    playWeaponChangedSound() {
-        const sound = new Sound(Sounds.WEAPPON_CHANGE.SOUND, Sounds.WEAPPON_CHANGE.DURATION)
-        sound.play()
-        sound.stop()
-    }
-
-    playFireSound() {
-        const sound = new Sound(this.weaponSound.SOUND, this.weaponSound.DURATION)
-        sound.play()
-        sound.stop()
-    }
-
-    playShrinkSound() {
-        const sound = new Sound(Sounds.SHRINK.SOUND, Sounds.SHRINK.DURATION)
-        sound.play()
-        sound.stop()
-    }
-
-    playDestroySound() {
-        const sound = new Sound(Sounds.DESTROY.SOUND, Sounds.DESTROY.DURATION)
-        sound.play()
-        sound.stop()
-    }
-
-    playGameOverSound() {
-        const sound = new Sound(Sounds.GAME_OVER.SOUND, Sounds.GAME_OVER.DURATION)
-        sound.play()
-        sound.stop()
     }
 
     handleCollision(enemy, index) {
         const enemyDistance = Math.hypot((this.player.x - enemy.x), (this.player.y - enemy.y))
         const isCollision = enemyDistance - enemy.radius - this.player.radius < 0
         if (isCollision) {
-            this.player.life -= Math.floor(enemy.radius)
-            if (this.player.life <= 0) {
+            const healthCount = Math.floor(enemy.radius / 16)
+            if (this.healthCount < healthCount) {
+                this.healthCount = 0
+            } else {
+                this.healthCount -= healthCount
+                this.healthScore = 0
+            }
+            if (this.healthCount <= 0) {
                 this.handleGameOver()
+                return
             } else {
                 setTimeout(() => {
                     // destroy the enemy
                     this.enemies.splice(index, 1)
                     this.createParticles(enemy, enemy)
+                    this.playDestroySound()
                 }, 0)
             }
-            this.life.innerText = this.player.life
+            for (let index = 0; index < healthCount; index++) {
+                this.healths.removeChild(this.healths.childNodes[0])
+            }
         }
     }
 
     handleGameOver() {
-        this.player.life = 0
+        this.player.health = 0
         cancelAnimationFrame(this.animationId)
         this.status.innerText = "Game Over"
         this.menu.classList.add("visible")
@@ -503,6 +631,14 @@ export default class Game {
         }
     }
 
+    refresh() {
+        cancelAnimationFrame(this.animationId)
+        clearInterval(this.interval)
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.animate()
+        this.createEnemies()
+    }
+
     moveLeft(event) {
         const isOutOfEdges = (this.player.x + this.player.radius) < 0
         if (isOutOfEdges) {
@@ -545,5 +681,47 @@ export default class Game {
 
     stopUpDown() {
         this.player.velocity.y = 0
+    }
+
+    playHealthSound() {
+        const sound = new Sound(Sounds.HEALTH.SOUND, Sounds.HEALTH.DURATION)
+        sound.play()
+        sound.stop()
+    }
+
+    playWeaponChangedSound() {
+        const sound = new Sound(Sounds.WEAPPON_CHANGE.SOUND, Sounds.WEAPPON_CHANGE.DURATION)
+        sound.play()
+        sound.stop()
+    }
+
+    playFireSound() {
+        const sound = new Sound(this.weaponSound.SOUND, this.weaponSound.DURATION)
+        sound.play()
+        sound.stop()
+    }
+
+    playShrinkSound() {
+        const sound = new Sound(Sounds.SHRINK.SOUND, Sounds.SHRINK.DURATION)
+        sound.play()
+        sound.stop()
+    }
+
+    playDestroySound() {
+        const sound = new Sound(Sounds.DESTROY.SOUND, Sounds.DESTROY.DURATION)
+        sound.play()
+        sound.stop()
+    }
+
+    playGameOverSound() {
+        const sound = new Sound(Sounds.GAME_OVER.SOUND, Sounds.GAME_OVER.DURATION)
+        sound.play()
+        sound.stop()
+    }
+
+    playAccessDeniedSound() {
+        const sound = new Sound(Sounds.ACCESS_DENIED.SOUND, Sounds.ACCESS_DENIED.DURATION)
+        sound.play()
+        sound.stop()
     }
 }

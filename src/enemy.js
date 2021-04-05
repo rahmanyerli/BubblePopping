@@ -1,6 +1,6 @@
 export default class Enemy {
 
-    constructor(context, x, y, radius, color, velocity) {
+    constructor(context, x, y, radius, color, velocity, armour) {
         this.context = context
         this.x = x
         this.y = y
@@ -8,7 +8,7 @@ export default class Enemy {
         this.defaultRadius = radius
         this.color = color
         this.velocity = velocity
-        this.strength = radius / 8
+        this.armour = armour
     }
 
     draw() {

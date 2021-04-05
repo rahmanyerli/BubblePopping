@@ -1,13 +1,16 @@
 export default class Sound {
 
     constructor(file, duration) {
+        this.root = "https://rahmanyerli.github.io/BubblePopping/assets/sounds/"
         this.audio = document.createElement("audio")
-        this.audio.src = `https://rahmanyerli.github.io/BubblePopping/assets/sounds/${file}`
+        if (location.href === "http://127.0.0.1:5500/") {
+            this.root = "../assets/sounds/"
+        }
+        this.audio.src = `${this.root}${file}`
         this.audio.setAttribute("preload", "auto")
         this.audio.setAttribute("controls", "none")
         this.audio.style.display = "none"
         this.duration = duration
-        document.body.appendChild(this.audio)
     }
 
     play() {
@@ -18,7 +21,6 @@ export default class Sound {
     stop() {
         setTimeout(() => {
             this.audio.pause()
-            document.body.removeChild(this.audio)
         }, this.duration);
     }
 }

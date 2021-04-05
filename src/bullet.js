@@ -1,6 +1,6 @@
 export default class Bullet {
 
-    constructor(context, x, y, radius, power, color, velocity) {
+    constructor(context, x, y, radius, power, color, velocity, fireType) {
         this.context = context
         this.x = x
         this.y = y
@@ -8,6 +8,7 @@ export default class Bullet {
         this.color = color
         this.velocity = velocity
         this.power = power
+        this.fireType = fireType
     }
 
     draw() {

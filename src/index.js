@@ -1,11 +1,11 @@
 import Game from "./game.js"
 
-let game
-let intervalId = null
-let x
-let y
+let game = null
+let intervalId = 0
+let x = 0
+let y = 0
 
-function mouseDown(event) {
+function mouseDown() {
     game.createBullet(x, y)
     intervalId = setInterval(() => {
         game.createBullet(x, y)
@@ -19,9 +19,26 @@ function mouseUp() {
 
 window.addEventListener("DOMContentLoaded", () => {
     game = new Game()
+    game.canvas.focus()
 }, false)
 
-document.addEventListener('mousemove', event => {
+window.addEventListener('resize', () => {
+    if (game) {
+        game.canvas.width = innerWidth
+        game.canvas.height = innerHeight
+    }
+}, false)
+
+window.addEventListener("contextmenu", event => {
+    event.preventDefault()
+    if (game.rocketCount > 0) {
+        game.createRocket(x, y)
+    } else {
+        game.playAccessDeniedSound()
+    }
+}, false)
+
+window.addEventListener("mousemove", event => {
     x = event.clientX
     y = event.clientY
 }, false)
@@ -64,7 +81,11 @@ window.addEventListener("keydown", (event) => {
             game.moveDown()
             break
         case " ":
-            game.createBullet(x, y)
+            if (game.grenadeCount > 0) {
+                game.createGrenade(x, y)
+            } else {
+                game.playAccessDeniedSound()
+            }
             break
         default:
             break
