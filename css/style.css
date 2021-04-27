@@ -27,7 +27,7 @@ canvas {
 
 #score_board {
     position: fixed;
-    top: 0.5rem;
+    bottom: 0.5rem;
     left: 0.5rem;
     font-size: 1rem;
     z-index: 10001;
@@ -100,29 +100,70 @@ p {
     color: #FF8844 !important;
 }
 
-.health {
+.bonus {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    font-size: 1rem;
+    z-index: 10001;
+}
+
+.badge {
+    content: "";
     display: inline-block;
-    width: 0.75rem;
-    height: 0.75rem;
-    background-color: #FF5555;
-    margin-left: 0.25rem;
-    border-radius: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    min-height: 2.5rem;
+    background-color: transparent;
+    background-image: url("../assets/images/badge.svg");
+    background-size: 2rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    border-radius: 3rem;
+}
+
+.health {
+    content: "";
+    display: inline-block;
+    width: 2.5rem;
+    height: 2.5rem;
+    min-height: 2.5rem;
+    background-color: transparent;
+    background-image: url("../assets/images/health.svg");
+    background-size: 2rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    border-radius: 3rem;
 }
 
 .rocket {
+    content: "";
     display: inline-block;
-    width: 0.75rem;
-    height: 0.75rem;
-    background-color: #88CC44;
-    margin-left: 0.25rem;
-    border-radius: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    min-height: 2.5rem;
+    background-color: transparent;
+    background-image: url("../assets/images/rocket.svg");
+    background-size: 2rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    border-radius: 3rem;
 }
 
 .grenade {
+    content: "";
     display: inline-block;
-    width: 0.75rem;
-    height: 0.75rem;
-    background-color: #00BBCC;
-    margin-left: 0.25rem;
-    border-radius: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    min-height: 2.5rem;
+    background-color: transparent;
+    background-image: url("../assets/images/grenade.svg");
+    background-size: 2rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    border-radius: 3rem;
 }

@@ -66,7 +66,7 @@ export default class Game {
         this.context = this.canvas.getContext("2d")
         this.animationId = 0
         this.gameState = GameStates.PAUSED
-        this.gameLevel = GameLevels.LEVEL_1
+        this.gameLevel
         this.currentScore = 0
         this.player = this.createPlayer()
         this.bullets = []
@@ -83,6 +83,8 @@ export default class Game {
         this.score = document.getElementById("score")
         this.menu = document.getElementById("menu_wrapper")
         this.status = document.getElementById("status")
+        this.badges = document.getElementById("badges")
+        this.badgeCount = 1
         this.healthCount = 0
         this.healthScore = 0
         this.healths = document.getElementById("healths")
@@ -93,6 +95,7 @@ export default class Game {
         this.grenadeScore = 0
         this.grenades = document.getElementById("grenades")
         this.getScore()
+        this.handleGameLevel()
     }
 
     avoidCanvasSelection() {
@@ -388,6 +391,13 @@ export default class Game {
         this.handleGrenades()
     }
 
+    addBadge() {
+        const badge = document.createElement("span")
+        badge.classList.add("badge")
+        this.badges.appendChild(badge)
+        this.playHealthSound()
+    }
+
     handleHealths() {
         if (this.healthCount === 10) {
             this.healthScore = 0
@@ -437,25 +447,33 @@ export default class Game {
             }
             this.gameLevel = GameLevels.LEVEL_5
             this.refresh()
+            this.addBadge()
         } else if (this.currentScore > 1000000) {
             if (this.gameLevel === GameLevels.LEVEL_4) {
                 return
             }
             this.gameLevel = GameLevels.LEVEL_4
             this.refresh()
+            this.addBadge()
         } else if (this.currentScore > 100000) {
             if (this.gameLevel === GameLevels.LEVEL_3) {
                 return
             }
             this.gameLevel = GameLevels.LEVEL_3
             this.refresh()
+            this.addBadge()
         } else if (this.currentScore > 10000) {
             if (this.gameLevel === GameLevels.LEVEL_2) {
                 return
             }
             this.gameLevel = GameLevels.LEVEL_2
             this.refresh()
+            this.addBadge()
         } else {
+            if (this.gameLevel === GameLevels.LEVEL_1) {
+                return
+            }
+            this.addBadge()
             this.gameLevel = GameLevels.LEVEL_1
         }
     }
